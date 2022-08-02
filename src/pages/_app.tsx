@@ -36,7 +36,7 @@ export default function MyApp(props: MyAppProps) {
           </Layout>
         </Context>
 
-      </DynamicHeader>
+      </DynamicRender>
     </CacheProvider>
   );
 }
