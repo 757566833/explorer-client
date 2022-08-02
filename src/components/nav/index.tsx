@@ -1,10 +1,11 @@
-import React, { useCallback, useState } from 'react'
-import { Box, AppBar, Toolbar, Typography, Switch, TextField, Paper, IconButton, InputBase } from "@mui/material"
+import React, { useCallback, useEffect, useState } from 'react'
+import { Box, AppBar, Toolbar, Typography, Switch, TextField, Paper, IconButton, InputBase, Stack } from "@mui/material"
 import { styled } from "@mui/material/styles";
 import { useClintNavigation } from '@/hooks/navigation';
 import { useMode } from '@/context/mode';
 import { Search } from '@mui/icons-material';
 import { IBlock, IResponseList } from '@/services/interface';
+import Provider from '@/instance/provider';
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     width: 62,
     height: 34,
@@ -54,6 +55,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 const Nav: React.FC = () => {
     const [mode, toggle] = useMode()
     const [navigation] = useClintNavigation();
+    const [chainId, setChainId] = useState("")
     const handleClick = useCallback(() => {
         navigation.push("/")
     }, [navigation])
@@ -61,15 +63,15 @@ const Nav: React.FC = () => {
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setValue(e.target.value)
     }, [])
-    const hash = useCallback(async (hash:string)=>{
+    const hash = useCallback(async (hash: string) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/block/hash/${hash}`)
         const response: IResponseList<IBlock> = await res.json()
-        if(response.hits.hits.length==0){
+        if (response.hits.hits.length == 0) {
             navigation.push(`/tx/${hash}`)
-        }else{
+        } else {
             navigation.push(`/block/${hash}`)
         }
-    },[navigation])
+    }, [navigation])
     const handleSearch = useCallback(() => {
         // navigation.push(`/block/${value}`)
         // return 
@@ -84,27 +86,43 @@ const Nav: React.FC = () => {
             case 0:
                 break;
             default:
-                console.log('va',value)
+                console.log('va', value)
                 navigation.push(`/block/${value}`)
                 break;
         }
     }, [hash, navigation, value])
-    const handleKeyDown = useCallback((e:React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>)=>{
-        if(e.key=="Enter"){
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        if (e.key == "Enter") {
             console.log(e)
             e.preventDefault();
             e.stopPropagation();
             handleSearch()
         }
-       
-    },[handleSearch])
+
+    }, [handleSearch])
+    const getChainId = useCallback(async () => {
+        const provider = Provider.getInstance();
+        const network = await provider.getNetwork()
+        setChainId(network.chainId.toString())
+    }, [])
+    useEffect(() => {
+        getChainId()
+    }, [getChainId])
     return <AppBar position="static">
         <Toolbar>
             <Box display={'flex'} justifyContent='space-between' alignItems={'center'} width='100%' height='100%'>
                 <Box flex={1}>
-                    <Typography variant="h5" fontWeight={'bold'} onClick={handleClick}>
-                        区块链浏览器
-                    </Typography>
+                    <Stack direction={'row'}  alignItems='center' spacing={3}>
+                        <Box>
+                            <Typography variant="h5" fontWeight={'bold'} onClick={handleClick}>
+                                区块链浏览器
+                            </Typography>
+                        </Box>
+                        <Box>
+                            <Typography>rpc: {process.env.NEXT_PUBLIC_RPC}</Typography>
+                            <Typography>chainId: {chainId}</Typography>
+                        </Box>
+                    </Stack>
                 </Box>
                 <Box flex={1} display='flex' justifyContent='space-between' alignItems={'center'}>
                     <Paper
@@ -119,7 +137,7 @@ const Nav: React.FC = () => {
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
                         />
-                        <IconButton onClick={handleSearch}  sx={{ p: '10px' }}>
+                        <IconButton onClick={handleSearch} sx={{ p: '10px' }}>
                             <Search />
                         </IconButton>
 

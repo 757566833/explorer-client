@@ -6,7 +6,7 @@ export  class  Provider {
     /**
      * 这里直接吞了error 没有返回就是错误了
      */
-    public static getInstance =async ()=>{
+    public static getInstance =()=>{
         return  Provider.provider;
     }
 
