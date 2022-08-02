@@ -9,7 +9,7 @@ import createEmotionCache from '@/config/createEmotionCache';
 import Layout from '@/layout';
 import Context from '@/context';
 import dynamic from 'next/dynamic'
-const DynamicHeader = dynamic<any>(() => import('@mui/material/styles').then(e=>e.ThemeProvider), {
+const DynamicRender = dynamic<any>(() => import('@mui/material/styles').then(e=>e.ThemeProvider), {
   ssr: false,
 })
 
@@ -27,7 +27,7 @@ export default function MyApp(props: MyAppProps) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <DynamicHeader theme={theme}>
+      <DynamicRender theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Context>
