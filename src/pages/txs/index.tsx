@@ -90,7 +90,7 @@ const Txs: React.FC = () => {
                                 </Ellipsis>
                             </TableCell>
                             <TableCell ><Box width={180}>{timeRender(item._source?.timestamp)}</Box></TableCell>
-                            <TableCell>{item._source?.gas}</TableCell>
+                            <TableCell>{item._source?.gasLimit}</TableCell>
                             <TableCell>{weiToGwei(item._source?.gasPrice)} gwei</TableCell>
                             <TableCell>
                                 <Ellipsis width={100}>
