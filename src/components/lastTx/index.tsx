@@ -59,7 +59,7 @@ const LastTx: React.FC = () => {
                                     gas: {weiToGwei(item._source?.gasPrice)}(gwei)
                                 </Box>
                                 <Box>
-                                    limit: {item._source.gas}
+                                    limit: {item._source.gasLimit}
                                 </Box>
                             </TableCell>
                             <TableCell>

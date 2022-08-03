@@ -56,7 +56,7 @@ export interface ITx {
         contractAddress: string
         cumulativeGasUsed: string
         from: string
-        gas: number
+        gasLimit: number
         gasPrice: string
         gasUsed: string
         hash: string
@@ -75,6 +75,7 @@ export interface ITx {
         status: number
         timestamp: number
         to: string
+        transactionFee:string
         transactionHash: string
         transactionIndex: number
         type: number

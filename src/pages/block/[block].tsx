@@ -19,7 +19,7 @@ const Block: React.FC = () => {
     }, [])
     useEffect(() => {
         if (block) {
-            func(block.toString())
+            func(block.toString()).then()
         }
     }, [block, func])
     return <Box width={1400} margin='0 auto'>

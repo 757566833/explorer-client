@@ -94,6 +94,13 @@ const Block: React.FC = () => {
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
+                        transactionFee
+                    </ListItemIcon>
+                    <ListItemText primary={data._source?.transactionFee} />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                    <ListItemIcon sx={{ width: 280 }}>
                         gas price
                     </ListItemIcon>
                     <ListItemText primary={`${weiToGwei(data._source?.gasPrice)} gwei`} />
@@ -103,7 +110,7 @@ const Block: React.FC = () => {
                     <ListItemIcon sx={{ width: 280 }}>
                         gas limit 
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.gas +` 发出的limit，实际可能并未消耗这么多，兼容性大坑`} />
+                    <ListItemText primary={data._source?.gasLimit} />
                 </ListItem>
                 <Divider />
                 
@@ -126,14 +133,14 @@ const Block: React.FC = () => {
                     <ListItemIcon sx={{ width: 280 }}>
                         maxFeePerGas
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.maxFeePerGas+` 兼容性大坑`} />
+                    <ListItemText primary={data._source?.maxFeePerGas} />
                 </ListItem>
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
                         maxPriorityFeePerGas
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.maxPriorityFeePerGas+` 兼容性大坑`} />
+                    <ListItemText primary={data._source?.maxPriorityFeePerGas} />
                 </ListItem>
                 <Divider />
                 <ListItem>
