@@ -11,7 +11,7 @@ import { receiverTypeRender } from '@/utils/render';
 const LastTx: React.FC = () => {
     const [data, setData] = useState<ITx[]>([])
     const func1 = useCallback(async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/balance/txs?size=5`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/txs?size=5`)
         const response: IResponseList<ITx> = await res.json()
         const hits = response.hits.hits
         const nextData: ITx[] = []
@@ -25,10 +25,10 @@ const LastTx: React.FC = () => {
     }, [func1])
     return <>
         <Typography color={theme => theme.palette.text.primary} variant="h6" fontWeight={'bold'}>
-            最近余额交易
+            最近交易
         </Typography>
         <Typography color={theme => theme.palette.text.primary} variant="body1">
-            最近关于余额的交易
+            最近公布的交易
         </Typography>
         <TableContainer component={Paper} elevation={0} variant='outlined'>
             <Table>
@@ -64,13 +64,13 @@ const LastTx: React.FC = () => {
                             </TableCell>
                             <TableCell>
                                 <Ellipsis width={100}>
-                                from: <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
+                                    from: <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
                                 </Ellipsis>
                                 <Ellipsis width={100}>
-                                {item._source?.to?'to':'contract'}: <Link href={`/address/${item._source?.to||item._source?.contractAddress}`}>{item._source?.to||item._source?.contractAddress||''}</Link>
+                                    {item._source?.to?'to':'contract'}: <Link href={`/address/${item._source?.to||item._source?.contractAddress}`}>{item._source?.to||item._source?.contractAddress||''}</Link>
                                 </Ellipsis>
                             </TableCell>
-                            <TableCell>{weiToEth(item._source?.value)} eth</TableCell>
+                            <TableCell><Box>{weiToEth(item._source?.value)} eth</Box><Box>{receiverTypeRender(item._source.to,item._source.contractAddress)}</Box></TableCell>
                             <TableCell>{ETxType[item._source?.type]}</TableCell>
 
                         </TableRow>
