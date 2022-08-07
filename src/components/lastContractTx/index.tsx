@@ -8,10 +8,10 @@ import { ETxType } from '@/constant/enum';
 import Ellipsis from '@/lib/ellipsis';
 import { receiverTypeRender } from '@/utils/render';
 
-const LastTx: React.FC = () => {
+const LastContractTx: React.FC = () => {
     const [data, setData] = useState<ITx[]>([])
     const func1 = useCallback(async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/balance/txs?size=5`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/contract/txs?size=5`)
         const response: IResponseList<ITx> = await res.json()
         const hits = response.hits.hits
         const nextData: ITx[] = []
@@ -25,10 +25,10 @@ const LastTx: React.FC = () => {
     }, [func1])
     return <>
         <Typography color={theme => theme.palette.text.primary} variant="h6" fontWeight={'bold'}>
-            最近余额交易
+            最近合同调用
         </Typography>
         <Typography color={theme => theme.palette.text.primary} variant="body1">
-            最近关于余额的交易
+            最近关于合同的交易
         </Typography>
         <TableContainer component={Paper} elevation={0} variant='outlined'>
             <Table>
@@ -83,4 +83,4 @@ const LastTx: React.FC = () => {
         </TableContainer>
     </>
 }
-export default LastTx
+export default LastContractTx

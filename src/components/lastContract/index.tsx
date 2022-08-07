@@ -11,7 +11,7 @@ import { receiverTypeRender } from '@/utils/render';
 const LastContractDeploy: React.FC = () => {
     const [data, setData] = useState<ITx[]>([])
     const func1 = useCallback(async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/contract/deploy?size=5`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/contracts?size=5`)
         const response: IResponseList<ITx> = await res.json()
         const hits = response.hits.hits
         const nextData: ITx[] = []
@@ -35,9 +35,10 @@ const LastContractDeploy: React.FC = () => {
                 <TableHead>
                     <TableRow>
                         <TableCell>hash</TableCell>
-                        <TableCell>gas</TableCell>
+                        <TableCell>time</TableCell>
                         <TableCell>contract</TableCell>
-                        <TableCell>模型</TableCell>
+                        <TableCell>deployer</TableCell>
+
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -49,26 +50,20 @@ const LastContractDeploy: React.FC = () => {
                                 <Ellipsis width={100}>
                                     <Link href={`/tx/${item._source?.hash}`}>{item._source?.hash||''}</Link>
                                 </Ellipsis>
-                                <Box>{timeRender(item._source?.timestamp)}</Box>
                             </TableCell>
                             <TableCell>
-                                <Box>
-                                    gas: {weiToGwei(item._source?.gasPrice)}(gwei)
-                                </Box>
-                                <Box>
-                                    limit: {item._source.gasLimit}
-                                </Box>
+                                {timeRender(item._source?.timestamp)}
                             </TableCell>
                             <TableCell>
                                 <Ellipsis width={200}>
-                                    deployer: <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
-                                </Ellipsis>
-                                <Ellipsis width={200}>
-                                    contract: <Link href={`/address/${item._source?.contractAddress}`}>{item._source?.contractAddress}</Link>
+                                   <Link href={`/address/${item._source?.contractAddress}`}>{item._source?.contractAddress||''}</Link>
                                 </Ellipsis>
                             </TableCell>
-
-                            <TableCell>{ETxType[item._source?.type]}</TableCell>
+                            <TableCell>
+                                <Ellipsis width={200}>
+                                <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
+                            </Ellipsis>
+                            </TableCell>
 
                         </TableRow>
                     ))}

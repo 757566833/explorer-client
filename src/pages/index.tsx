@@ -2,8 +2,8 @@ import React from "react";
 import { Box, Grid } from '@mui/material'
 
 import LastBlock from "@/components/lastBlock";
-import LastBalanceTx from "@/components/lastBalanceTx";
-import LastContractDeploy from "@/components/lastContractDeploy";
+import LastContractTx from "@/components/lastContractTx";
+import LastContractDeploy from "@/components/lastContract";
 import LastTx from "@/components/lastTx";
 const Index: React.FC = () => {
     return <Box width={1400} margin='0 auto'>
@@ -20,7 +20,7 @@ const Index: React.FC = () => {
 
             </Grid>
             <Grid item xs={6}>
-                <LastBalanceTx/>
+                <LastContractTx/>
 
             </Grid>
         </Grid>
