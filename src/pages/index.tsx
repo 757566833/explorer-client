@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid } from '@mui/material'
+import {Box, Button, Grid} from '@mui/material'
 
 import LastBlock from "@/components/lastBlock";
 import LastContractTx from "@/components/lastContractTx";

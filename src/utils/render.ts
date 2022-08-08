@@ -1,3 +1,5 @@
+import {ContractEvent} from "@/constant/contract";
+
 export const receiverTypeRender = (to?:string,contractAddress?:string)=>{
     let result = ''
     if(to){
@@ -12,4 +14,12 @@ export const receiverTypeRender = (to?:string,contractAddress?:string)=>{
     }
     return result
 
+}
+export const   contractMethodRender = (str?:string)=>{
+    if(!str){
+        return ''
+    }
+    const method = ContractEvent[str]
+    const [pre] = method.split('(')
+    return  pre
 }

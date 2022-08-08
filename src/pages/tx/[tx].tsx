@@ -23,6 +23,18 @@ const Block: React.FC = () => {
         }
 
     }, [func, tx])
+    const getAddressesDetail = useCallback(async (addresses:string[])=>{
+        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/addresses/detail?addresses=${addresses.toString()}`)
+        const response: ITx = await res.json()
+        console.log(response)
+    },[])
+    useEffect(()=>{
+        const addresses:string[] = [data._source?.from,data._source?.to,data._source?.contractAddress].filter((item)=>item) as string[];
+        if(addresses.length>0){
+            getAddressesDetail(addresses).then()
+        }
+
+    },[data._source?.from,data._source?.to,data._source?.contractAddress])
     return <Box width={1400} margin='0 auto'>
         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} padding={3}>
             tx
@@ -73,14 +85,14 @@ const Block: React.FC = () => {
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
-                        to 
+                        to
                     </ListItemIcon>
                     <ListItemText primary={data._source?.to} />
                 </ListItem>
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
-                    contractAddress 
+                    contractAddress
                     </ListItemIcon>
                     <ListItemText primary={data._source?.contractAddress} />
                 </ListItem>
@@ -108,12 +120,12 @@ const Block: React.FC = () => {
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
-                        gas limit 
+                        gas limit
                     </ListItemIcon>
                     <ListItemText primary={data._source?.gasLimit} />
                 </ListItem>
                 <Divider />
-                
+
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
                     gasUsed
@@ -128,7 +140,7 @@ const Block: React.FC = () => {
                     <ListItemText primary={data._source?.cumulativeGasUsed} />
                 </ListItem>
                 <Divider />
-                
+
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
                         maxFeePerGas

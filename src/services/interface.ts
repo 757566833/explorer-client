@@ -45,7 +45,17 @@ export interface IBlock {
     "_type": string,
     "sort": number[]
 }
-
+export  interface  log{
+    address: string
+    blockHash: string
+    blockNumber: string
+    data: string
+    logIndex: string
+    removed: boolean
+    topics: string[]
+    transactionHash: string
+    transactionIndex: string
+}
 export interface ITx {
     "_id": string,
     "_index": string,
@@ -62,7 +72,7 @@ export interface ITx {
         hash: string
         input: string
         isFake: boolean
-        logs: string[]
+        logs: log[]
         logsBloom: string
         maxFeePerGas: string
         maxPriorityFeePerGas: string
