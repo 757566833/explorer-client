@@ -40,7 +40,7 @@ const Block: React.FC = () => {
             getAddressesDetail(addresses).then()
         }
 
-    }, [data._source?.from, data._source?.to, data._source?.contractAddress])
+    }, [data._source?.from, data._source?.to, data._source?.contractAddress, getAddressesDetail])
     return <Box width={1400} margin='0 auto'>
         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} padding={3}>
             tx

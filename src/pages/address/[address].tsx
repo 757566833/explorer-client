@@ -59,7 +59,7 @@ const Address: React.FC = () => {
             getAddressesDetail(address?.toString()).then()
         }
 
-    }, [page, address, func1, func2, size])
+    }, [page, address, func1, func2, size, getAddressesDetail])
 
     return <Box width={1400} margin='0 auto'>
          <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} paddingTop={3} height={58}>
