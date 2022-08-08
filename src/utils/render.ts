@@ -19,7 +19,5 @@ export const   contractMethodRender = (str?:string)=>{
     if(!str){
         return ''
     }
-    const method = ContractEvent[str]
-    const [pre] = method.split('(')
-    return  pre
+    return ContractEvent[str]?.method||''
 }

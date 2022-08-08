@@ -48,7 +48,7 @@ const LastTx: React.FC = () => {
                             key={item._source?.hash}
                         >
                             <TableCell>
-                                <Ellipsis width={160}>
+                                <Ellipsis ellipsisWidth={160}>
                                     {<Link href={`/tx/${item._source?.hash}`}>{item._source?.hash||''}</Link>}
                                 </Ellipsis>
                                 {/* <Box style={{ width: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Link href={`/tx/${item._source?.hash}`}>{item._source?.hash}</Link></Box> */}
@@ -63,10 +63,10 @@ const LastTx: React.FC = () => {
                                 </Box>
                             </TableCell>
                             <TableCell>
-                                <Ellipsis width={100}>
+                                <Ellipsis ellipsisWidth={100}>
                                     from: <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
                                 </Ellipsis>
-                                <Ellipsis width={100}>
+                                <Ellipsis ellipsisWidth={100}>
                                     {item._source?.to?'to':'contract'}: <Link href={`/address/${item._source?.to||item._source?.contractAddress}`}>{item._source?.to||item._source?.contractAddress||''}</Link>
                                 </Ellipsis>
                             </TableCell>

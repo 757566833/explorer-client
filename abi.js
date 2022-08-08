@@ -1,3 +1,5 @@
+const {ethers}  = require("ethers");
+
 const json = {
     "abi": [
         {
@@ -635,11 +637,15 @@ const json = {
         }
     ]
 }
-let eventList = []
+let events = {}
 for (const abiElement of json.abi) {
     if(abiElement.type=='event'){
-
         let str = `${abiElement.name}(`
+
+        const item = {}
+        item.method = abiElement.name
+        item.parameter = []
+
         if(abiElement.inputs){
             for (const [index,abiElementElement] of abiElement.inputs.entries()) {
                 if(index==abiElement.inputs.length-1){
@@ -647,13 +653,19 @@ for (const abiElement of json.abi) {
                 }else{
                     str+=`${abiElementElement.type},`
                 }
-
+                item.parameter.push({
+                    name: abiElementElement.name,
+                    type: abiElementElement.type
+                })
             }
         }
         str +=')'
-        eventList.push(str)
+
+        const key = ethers.utils.id(str)
+        events[key] = item
+
     }
 }
-eventList= new Set(eventList)
-eventList = Array.from(eventList)
-console.log(eventList)
+
+console.log(events)
+console.log(JSON.stringify(events))

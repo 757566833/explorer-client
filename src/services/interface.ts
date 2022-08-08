@@ -97,3 +97,25 @@ export interface ITx {
     "sort": number[]
 }
 
+export enum EAddressType{
+    "address" = 1,
+    "contract"=2,
+}
+
+export interface IAddress {
+    "_id": string,
+    "_index": string,
+    "_score": string,
+    "_source": {
+        type:number
+    },
+    "_type": string,
+    "sort": number[]
+}
+export interface IAddressListItem {
+    _id: string
+    _index: string
+    _score: number
+    _source: {type: number}
+    _type: string
+}

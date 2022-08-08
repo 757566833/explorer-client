@@ -49,7 +49,7 @@ const LastContractTx: React.FC = () => {
                             key={item._source?.hash}
                         >
                             <TableCell>
-                                <Ellipsis width={160}>
+                                <Ellipsis ellipsisWidth={100}>
                                     {<Link href={`/tx/${item._source?.hash}`}>{item._source?.hash||''}</Link>}
                                 </Ellipsis>
 
@@ -58,8 +58,8 @@ const LastContractTx: React.FC = () => {
                                 {timeRender(item._source?.timestamp)}
                             </TableCell>
                             <TableCell>
-                                <Ellipsis width={160}>
-                                    {<Link href={`/tx/${item._source?.to}`}>{item._source?.to||''}</Link>}
+                                <Ellipsis ellipsisWidth={100}>
+                                    {<Link href={`/address/${item._source?.to}`}>{item._source?.to||''}</Link>}
                                 </Ellipsis>
 
                             </TableCell>

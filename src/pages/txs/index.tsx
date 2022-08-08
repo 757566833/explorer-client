@@ -85,7 +85,7 @@ const Txs: React.FC = () => {
                             key={item._source?.number}
                         >
                             <TableCell>
-                                <Ellipsis width={100}>
+                                <Ellipsis ellipsisWidth={100}>
                                     <Link href={`/tx/${item._source?.hash}`}>{item._source?.hash||''}</Link>
                                 </Ellipsis>
                             </TableCell>
@@ -93,12 +93,12 @@ const Txs: React.FC = () => {
                             <TableCell>{item._source?.gasLimit}</TableCell>
                             <TableCell>{weiToGwei(item._source?.gasPrice)} gwei</TableCell>
                             <TableCell>
-                                <Ellipsis width={100}>
+                                <Ellipsis ellipsisWidth={100}>
                                     <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
                                 </Ellipsis>
                             </TableCell>
                             <TableCell>
-                                <Ellipsis width={100}>
+                                <Ellipsis ellipsisWidth={100}>
                                     {receiverTypeRender(item._source?.to,item._source?.contractAddress)}: <Link href={`/address/${item._source?.to||item._source?.contractAddress}`}>{item._source?.to||item._source?.contractAddress||''}</Link>
                                 </Ellipsis>
                             </TableCell>

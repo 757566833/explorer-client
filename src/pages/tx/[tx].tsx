@@ -1,16 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Box, List, ListItem, ListItemText, Typography, Divider, Paper, ListItemIcon } from "@mui/material"
-import { useRouter } from 'next/router'
-import { ITx } from '@/services/interface';
-import { timeRender } from '@/lib/time';
-import { weiToEth, weiToGwei } from '@/lib/utils/eth';
-import { ETxStatus, ETxType } from '@/constant/enum';
+import React, {useCallback, useEffect, useState} from 'react'
+import {Box, List, ListItem, ListItemText, Typography, Divider, Paper, ListItemIcon} from "@mui/material"
+import {useRouter} from 'next/router'
+import {EAddressType, IAddress, IAddressListItem, IResponseList, ITx} from '@/services/interface';
+import {timeRender} from '@/lib/time';
+import {weiToEth, weiToGwei} from '@/lib/utils/eth';
+import {ETxStatus, ETxType} from '@/constant/enum';
 import Link from 'next/link';
+import ContractDetail from "@/lib/contract/detai";
 
 const Block: React.FC = () => {
     const router = useRouter();
-    const { query } = router
-    const { tx } = query
+    const {query} = router
+    const {tx} = query
     const [data, setData] = useState<Partial<ITx>>({})
     const func = useCallback(async (tx: string) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/tx/${tx}`)
@@ -23,18 +24,23 @@ const Block: React.FC = () => {
         }
 
     }, [func, tx])
-    const getAddressesDetail = useCallback(async (addresses:string[])=>{
+    const [addressMap, setAddressMap] = useState<{ [key: string]: string }>({});
+    const getAddressesDetail = useCallback(async (addresses: string[]) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/addresses/detail?addresses=${addresses.toString()}`)
-        const response: ITx = await res.json()
-        console.log(response)
-    },[])
-    useEffect(()=>{
-        const addresses:string[] = [data._source?.from,data._source?.to,data._source?.contractAddress].filter((item)=>item) as string[];
-        if(addresses.length>0){
+        const response: IResponseList<IAddressListItem> = await res.json()
+        const map: { [key: string]: string } = {}
+        for (let i = 0; i < response.hits.hits.length; i++) {
+            map[response.hits.hits[i]._id] = EAddressType[response.hits.hits[i]._source.type]
+        }
+        setAddressMap(map)
+    }, [])
+    useEffect(() => {
+        const addresses: string[] = [data._source?.from, data._source?.to, data._source?.contractAddress].filter((item) => item) as string[];
+        if (addresses.length > 0) {
             getAddressesDetail(addresses).then()
         }
 
-    },[data._source?.from,data._source?.to,data._source?.contractAddress])
+    }, [data._source?.from, data._source?.to, data._source?.contractAddress])
     return <Box width={1400} margin='0 auto'>
         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} padding={3}>
             tx
@@ -42,173 +48,176 @@ const Block: React.FC = () => {
         <Paper variant='outlined'>
             <List>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         hash 交易hash
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.hash} />
+                    <ListItemText primary={data._source?.hash}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         number 所在块
                     </ListItemIcon>
-                    <ListItemText primary={<Link href={`/block/${data._source?.number}`}>{data._source?.number||''}</Link>} />
+                    <ListItemText
+                        primary={<Link href={`/block/${data._source?.number}`}>{data._source?.number || ''}</Link>}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         blockHash
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.blockHash} />
+                    <ListItemText primary={<Link href={`/block/${data._source?.from}`}>{data._source?.blockHash||''}</Link>}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         timestamp
                     </ListItemIcon>
-                    <ListItemText primary={timeRender(data._source?.timestamp)} />
+                    <ListItemText primary={timeRender(data._source?.timestamp)}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
-                    status
+                    <ListItemIcon sx={{width: 280}}>
+                        status
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.status!=undefined?ETxStatus[data._source?.status]:''} />
+                    <ListItemText primary={data._source?.status != undefined ? ETxStatus[data._source?.status] : ''}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         from 发出方
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.from} />
+                    <ListItemText primary={<Link href={`/address/${data._source?.from}`}>{data._source?.from||''}</Link>}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         to
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.to} />
+                    <ListItemText primary={<>{addressMap[data._source?.to||'']} <Link href={`/address/${data._source?.to}`}>{data._source?.to||''}</Link></>}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
+                <ContractDetail logs={data._source?.logs}/>
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
-                    contractAddress
+                    <ListItemIcon sx={{width: 280}}>
+                        contractAddress
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.contractAddress} />
+                    <ListItemText primary={data._source?.contractAddress}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         value
                     </ListItemIcon>
-                    <ListItemText primary={`${weiToEth(data._source?.value)} eth`} />
+                    <ListItemText primary={`${weiToEth(data._source?.value)} eth`}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         transactionFee
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.transactionFee} />
+                    <ListItemText primary={data._source?.transactionFee}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         gas price
                     </ListItemIcon>
-                    <ListItemText primary={`${weiToGwei(data._source?.gasPrice)} gwei`} />
+                    <ListItemText primary={`${weiToGwei(data._source?.gasPrice)} gwei`}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         gas limit
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.gasLimit} />
+                    <ListItemText primary={data._source?.gasLimit}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
 
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
-                    gasUsed
+                    <ListItemIcon sx={{width: 280}}>
+                        gasUsed
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.gasUsed} />
+                    <ListItemText primary={data._source?.gasUsed}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
-                    cumulativeGasUsed
+                    <ListItemIcon sx={{width: 280}}>
+                        cumulativeGasUsed
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.cumulativeGasUsed} />
+                    <ListItemText primary={data._source?.cumulativeGasUsed}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
 
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         maxFeePerGas
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.maxFeePerGas} />
+                    <ListItemText primary={data._source?.maxFeePerGas}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         maxPriorityFeePerGas
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.maxPriorityFeePerGas} />
+                    <ListItemText primary={data._source?.maxPriorityFeePerGas}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         nonce
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.nonce} />
+                    <ListItemText primary={data._source?.nonce}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         r
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.r} />
+                    <ListItemText primary={data._source?.r}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         s
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.s} />
+                    <ListItemText primary={data._source?.s}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         v
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.v} />
+                    <ListItemText primary={data._source?.v}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         type
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.type != undefined ? ETxType[data._source?.type] : ''} />
+                    <ListItemText primary={data._source?.type != undefined ? ETxType[data._source?.type] : ''}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         input
                     </ListItemIcon>
-                    <ListItemText primary={data._source?.input} />
+                    <ListItemText primary={data._source?.input}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
+                    <ListItemIcon sx={{width: 280}}>
                         isFake
                     </ListItemIcon>
-                    <ListItemText primary={`${data._source?.isFake}`} />
+                    <ListItemText primary={`${data._source?.isFake}`}/>
                 </ListItem>
-                <Divider />
+                <Divider/>
                 <ListItem>
-                    <ListItemIcon sx={{ width: 280 }}>
-                    transactionIndex
+                    <ListItemIcon sx={{width: 280}}>
+                        transactionIndex
                     </ListItemIcon>
-                    <ListItemText primary={`${data._source?.transactionIndex}`} />
+                    <ListItemText primary={`${data._source?.transactionIndex}`}/>
                 </ListItem>
             </List>
         </Paper>

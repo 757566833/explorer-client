@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Box, Chip, TablePagination, TableFooter, Typography, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, List, ListItem, ListItemAvatar, Avatar, ListItemText, Button, useTheme, IconButton } from '@mui/material'
 import { LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material'
 import {ethers} from 'ethers'
-import { ITx, IResponseList } from "@/services/interface";
+import {ITx, IResponseList, IAddressListItem, EAddressType} from "@/services/interface";
 import { timeRender } from "@/lib/time";
 import { useRouter } from 'next/router';
 import { ETxType } from '@/constant/enum';
@@ -15,9 +15,10 @@ import { useClintNavigation } from '@/hooks/navigation';
 const Address: React.FC = () => {
     const theme = useTheme();
     const [data, setData] = useState<ITx[]>([])
-    const [balance, setbalance] = useState("")
+    const [balance, setBalance] = useState("")
     const router = useRouter();
     const [clientNavigation] = useClintNavigation()
+    const [type,setType] = useState("address")
     const { query } = router
     const { address ,size='10',page='1' } = query
     const func1 = useCallback(async (page: string,size:string, address: string) => {
@@ -30,36 +31,47 @@ const Address: React.FC = () => {
         }
         setData(nextData)
     }, [])
+    const getAddressesDetail = useCallback(async (address: string) => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/addresses/detail?addresses=${address.toString()}`)
+        const response: IResponseList<IAddressListItem> = await res.json()
+        const type =  EAddressType[response.hits.hits[0]._source.type]
+        setType(type)
+    }, [])
     const func2 = useCallback(async (address: string) => {
         const instance = await Provider.getInstance();
         const res = await instance.getBalance(address)
-        setbalance(res.toString())
+        setBalance(res.toString())
     }, [])
     const handleBackButtonClick = useCallback(() => {
-        clientNavigation.push(`/address/${address}?page=${ethers.BigNumber.from(page).sub(1).toString()}&size=${size}`)
+        clientNavigation.push(`/address/${address}?page=${ethers.BigNumber.from(page).sub(1).toString()}&size=${size}`).then()
     },[address, clientNavigation, page, size]);
 
     const handleNextButtonClick =useCallback( () => {
-        clientNavigation.push(`/address/${address}?page=${ethers.BigNumber.from(page).add(1).toString()}&size=${size}`)
+        clientNavigation.push(`/address/${address}?page=${ethers.BigNumber.from(page).add(1).toString()}&size=${size}`).then()
     },[address, clientNavigation, page, size]);
 
 
 
     useEffect(() => {
         if (address) {
-            func1(page.toString(),size.toString(), address.toString())
-            func2(address.toString())
+            func1(page.toString(),size.toString(), address.toString()).then()
+            func2(address.toString()).then()
+            getAddressesDetail(address?.toString()).then()
         }
 
     }, [page, address, func1, func2, size])
 
     return <Box width={1400} margin='0 auto'>
-         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} padding={3}>
-            address
+         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} paddingTop={3} height={58}>
+             {type}
+        </Typography>
+        <Typography variant="body1" >
+            {address}
         </Typography>
         <Typography variant="body1" >
             {weiToEth(balance)} eth
         </Typography>
+
         <TableContainer component={Paper} elevation={0} variant='outlined'>
             <Table>
                 <TableHead>
@@ -80,7 +92,7 @@ const Address: React.FC = () => {
                             key={item._source?.number}
                         >
                             <TableCell>
-                                <Ellipsis width={160}>
+                                <Ellipsis ellipsisWidth={160}>
                                     <Link href={`/tx/${item._source?.hash}`}>{item._source?.hash || ''}</Link>
                                 </Ellipsis>
                             </TableCell>
@@ -89,20 +101,20 @@ const Address: React.FC = () => {
                             </TableCell>
                             <TableCell><Link href={`/block/${item._source?.number}`}>{item._source?.number || ''}</Link></TableCell>
                             <TableCell>
-                                {address == item._source.from ? <Chip label={<Ellipsis width={160}>
+                                {address == item._source.from ? <Chip label={<Ellipsis ellipsisWidth={160}>
                                     <Link href={`/address/${item._source?.from}`} passHref={true}>
                                         <a style={{ color: '#ffffff' }}>{item._source?.from || ''}</a>
                                     </Link>
-                                </Ellipsis>} color="primary" /> : <Ellipsis width={160}>
+                                </Ellipsis>} color="primary" /> : <Ellipsis ellipsisWidth={160}>
                                     <Link href={`/address/${item._source?.from}`}>{item._source?.from || ''}</Link>
                                 </Ellipsis>}
 
                             </TableCell>
                             <TableCell>
 
-                                {address == item._source.to ? <Chip label={<Ellipsis width={160}>
+                                {address == item._source.to ? <Chip label={<Ellipsis ellipsisWidth={160}>
                                     <Link href={`/address/${item._source?.to}`} passHref={true}><a style={{ color: '#ffffff' }}>{item._source?.to || ''}</a></Link>
-                                </Ellipsis>} color="primary" /> : <Ellipsis width={160}>
+                                </Ellipsis>} color="primary" /> : <Ellipsis ellipsisWidth={160}>
                                     <Link href={`/address/${item._source?.to}`}>{item._source?.to || ''}</Link>
                                 </Ellipsis>}
 
