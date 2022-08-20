@@ -6,7 +6,8 @@ import { weiToEth, weiToGwei } from '@/lib/utils/eth';
 import Link from 'next/link';
 import { ETxType } from '@/constant/enum';
 import Ellipsis from '@/lib/ellipsis';
-import { receiverTypeRender } from '@/utils/render';
+import {contractMethodRender, receiverTypeRender} from '@/utils/render';
+import {ContractEvent} from "@/constant/contract";
 
 const LastContractTx: React.FC = () => {
     const [data, setData] = useState<ITx[]>([])
@@ -36,9 +37,9 @@ const LastContractTx: React.FC = () => {
                     <TableRow>
                         <TableCell>hash</TableCell>
                         {/* <TableCell>number</TableCell> */}
-                        <TableCell>gas</TableCell>
-                        <TableCell>address</TableCell>
-                        <TableCell>value</TableCell>
+                        <TableCell>time</TableCell>
+                        <TableCell>contract</TableCell>
+                        <TableCell>method</TableCell>
                         <TableCell>模型</TableCell>
                     </TableRow>
                 </TableHead>
@@ -48,29 +49,23 @@ const LastContractTx: React.FC = () => {
                             key={item._source?.hash}
                         >
                             <TableCell>
-                                <Ellipsis width={160}>
+                                <Ellipsis ellipsisWidth={100}>
                                     {<Link href={`/tx/${item._source?.hash}`}>{item._source?.hash||''}</Link>}
                                 </Ellipsis>
-                                {/* <Box style={{ width: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Link href={`/tx/${item._source?.hash}`}>{item._source?.hash}</Link></Box> */}
-                                <Box>{timeRender(item._source?.timestamp)}</Box>
+
                             </TableCell>
                             <TableCell>
-                                <Box>
-                                    gas: {weiToGwei(item._source?.gasPrice)}(gwei)
-                                </Box>
-                                <Box>
-                                    limit: {item._source.gasLimit}
-                                </Box>
+                                {timeRender(item._source?.timestamp)}
                             </TableCell>
                             <TableCell>
-                                <Ellipsis width={100}>
-                                from: <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
+                                <Ellipsis ellipsisWidth={100}>
+                                    {<Link href={`/address/${item._source?.to}`}>{item._source?.to||''}</Link>}
                                 </Ellipsis>
-                                <Ellipsis width={100}>
-                                {item._source?.to?'to':'contract'}: <Link href={`/address/${item._source?.to||item._source?.contractAddress}`}>{item._source?.to||item._source?.contractAddress||''}</Link>
-                                </Ellipsis>
+
                             </TableCell>
-                            <TableCell>{weiToEth(item._source?.value)} eth</TableCell>
+                            <TableCell>
+                                {contractMethodRender(item._source?.logs[0].topics[0])}
+                            </TableCell>
                             <TableCell>{ETxType[item._source?.type]}</TableCell>
 
                         </TableRow>

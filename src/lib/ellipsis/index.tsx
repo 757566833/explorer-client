@@ -2,12 +2,10 @@ import { Box, BoxTypeMap } from "@mui/material";
 import {DefaultComponentProps} from '@mui/material/OverridableComponent';
 import React, { PropsWithChildren } from "react";
 export interface EllipsisProps extends DefaultComponentProps<BoxTypeMap>{
-    text?:string,
-    successText?:string;
-    errorText?:string
+    ellipsisWidth:number
   }
   export const Ellipsis:React.FC<PropsWithChildren<EllipsisProps>> = (props)=>{
-    
-    return <Box style={{ width: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} {...props}/>
+    const {ellipsisWidth=100,...others} = props
+    return <Box style={{ width: ellipsisWidth, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} {...others}/>
 }
 export default Ellipsis

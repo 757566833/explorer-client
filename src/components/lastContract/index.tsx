@@ -47,7 +47,7 @@ const LastContractDeploy: React.FC = () => {
                             key={item._source?.hash}
                         >
                             <TableCell>
-                                <Ellipsis width={100}>
+                                <Ellipsis ellipsisWidth={100}>
                                     <Link href={`/tx/${item._source?.hash}`}>{item._source?.hash||''}</Link>
                                 </Ellipsis>
                             </TableCell>
@@ -55,12 +55,12 @@ const LastContractDeploy: React.FC = () => {
                                 {timeRender(item._source?.timestamp)}
                             </TableCell>
                             <TableCell>
-                                <Ellipsis width={200}>
+                                <Ellipsis ellipsisWidth={100}>
                                    <Link href={`/address/${item._source?.contractAddress}`}>{item._source?.contractAddress||''}</Link>
                                 </Ellipsis>
                             </TableCell>
                             <TableCell>
-                                <Ellipsis width={200}>
+                                <Ellipsis ellipsisWidth={100}>
                                 <Link href={`/address/${item._source?.from}`}>{item._source?.from||''}</Link>
                             </Ellipsis>
                             </TableCell>
