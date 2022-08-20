@@ -6,23 +6,52 @@ import { timeRender } from '@/lib/time';
 import { weiToEth, weiToGwei } from '@/lib/utils/eth';
 import { ETxStatus, ETxType } from '@/constant/enum';
 import Link from 'next/link';
+import Provider from "@/instance/provider";
+import {TransactionRequest} from "@ethersproject/abstract-provider/src.ts";
+import {ethers} from "ethers";
+const decodeMessage = (code:string) =>{
 
+    let codeString = `0x${code.substr(138)}`.replace(/0+$/, '')
+
+    // If the codeString is an odd number of characters, add a trailing 0
+    if (codeString.length % 2 === 1) {
+        codeString += '0'
+    }
+
+    return ethers.utils.toUtf8String(codeString)
+
+}
 const Block: React.FC = () => {
     const router = useRouter();
     const { query } = router
     const { tx } = query
     const [data, setData] = useState<Partial<ITx>>({})
+    const [reason,setReason] = useState("")
     const func = useCallback(async (tx: string) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/tx/${tx}`)
         const response: ITx = await res.json()
         setData(response)
     }, [])
+    const getReason = useCallback(async (txHash:string,blockHash:string)=>{
+        const provider = Provider.getInstance()
+        const tx = await provider.getTransaction(txHash) as TransactionRequest
+        console.log(tx,blockHash)
+        const code =  await provider.call(tx, blockHash)
+        const reason = decodeMessage(code)
+        setReason(reason)
+    },[])
     useEffect(() => {
         if (tx) {
             func(tx.toString())
         }
 
     }, [func, tx])
+    useEffect(()=>{
+        if(data._source?.status==0&&tx){
+            getReason(tx.toString(),data._source.blockHash).then()
+        }
+    },[data._source?.status,tx,data._source?.blockHash])
+
     return <Box width={1400} margin='0 auto'>
         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} padding={3}>
             tx
@@ -62,6 +91,13 @@ const Block: React.FC = () => {
                     status
                     </ListItemIcon>
                     <ListItemText primary={data._source?.status!=undefined?ETxStatus[data._source?.status]:''} />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                    <ListItemIcon sx={{ width: 280 }}>
+                        reason
+                    </ListItemIcon>
+                    <ListItemText primary={reason} />
                 </ListItem>
                 <Divider />
                 <ListItem>

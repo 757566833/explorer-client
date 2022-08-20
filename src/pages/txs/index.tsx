@@ -69,6 +69,7 @@ const Txs: React.FC = () => {
                 <TableHead>
                     <TableRow>
                         <TableCell>hash</TableCell>
+                        <TableCell>result</TableCell>
                         <TableCell>timestamp</TableCell>
                         <TableCell>gas</TableCell>
                         <TableCell>gasPrice</TableCell>
@@ -82,13 +83,14 @@ const Txs: React.FC = () => {
                 <TableBody>
                     {data.map((item: ITx) => (
                         <TableRow
-                            key={item._source?.number}
+                            key={item._source?.hash}
                         >
                             <TableCell>
                                 <Ellipsis width={100}>
                                     <Link href={`/tx/${item._source?.hash}`}>{item._source?.hash||''}</Link>
                                 </Ellipsis>
                             </TableCell>
+                            <TableCell >{item._source.status}</TableCell>
                             <TableCell ><Box width={180}>{timeRender(item._source?.timestamp)}</Box></TableCell>
                             <TableCell>{item._source?.gasLimit}</TableCell>
                             <TableCell>{weiToGwei(item._source?.gasPrice)} gwei</TableCell>
