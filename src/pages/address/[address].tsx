@@ -50,7 +50,15 @@ const Address: React.FC = () => {
         clientNavigation.push(`/address/${address}?page=${ethers.BigNumber.from(page).add(1).toString()}&size=${size}`).then()
     },[address, clientNavigation, page, size]);
 
+const refreshAddress =useCallback(async ()=>{
+    if(address){
+        await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/refresh/${address?.toString()}`,{
+            method:"POST"
+        })
+        getAddressesDetail(address?.toString()).then()
+    }
 
+},[])
 
     useEffect(() => {
         if (address) {
@@ -63,12 +71,12 @@ const Address: React.FC = () => {
 
     return <Box width={1400} margin='0 auto'>
          <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} paddingTop={3} height={58}>
-             {type}
+             {type}<Button variant={"text"} onClick={refreshAddress}>类型错误？点击刷新</Button>
         </Typography>
-        <Typography variant="body1" >
+        <Typography color={theme => theme.palette.text.primary} variant="body1" >
             {address}
         </Typography>
-        <Typography variant="body1" >
+        <Typography color={theme => theme.palette.text.primary} variant="body1" >
             {weiToEth(balance)} eth
         </Typography>
 
