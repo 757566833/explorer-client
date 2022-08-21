@@ -18,7 +18,7 @@ const Address: React.FC = () => {
     const [balance, setBalance] = useState("")
     const router = useRouter();
     const [clientNavigation] = useClintNavigation()
-    const [type,setType] = useState("address")
+    const [type,setType] = useState("unknow")
     const { query } = router
     const { address ,size='10',page='1' } = query
     const func1 = useCallback(async (page: string,size:string, address: string) => {
@@ -34,8 +34,13 @@ const Address: React.FC = () => {
     const getAddressesDetail = useCallback(async (address: string) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/addresses/detail?addresses=${address.toString()}`)
         const response: IResponseList<IAddressListItem> = await res.json()
-        const type =  EAddressType[response.hits.hits[0]._source.type]
-        setType(type)
+        try {
+            const type =  EAddressType[response.hits.hits[0]._source.type]
+            setType(type)
+        }catch (e) {
+            
+        }
+     
     }, [])
     const func2 = useCallback(async (address: string) => {
         const instance = await Provider.getInstance();
@@ -71,7 +76,7 @@ const refreshAddress =useCallback(async ()=>{
 
     return <Box width={1400} margin='0 auto'>
          <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} paddingTop={3} height={58}>
-             {type}<Button variant={"text"} onClick={refreshAddress}>类型错误？点击刷新</Button>
+             {type}{type!="unknow"||<Button variant={"text"} onClick={refreshAddress}>类型错误？点击刷新</Button>}
         </Typography>
         <Typography color={theme => theme.palette.text.primary} variant="body1" >
             {address}
