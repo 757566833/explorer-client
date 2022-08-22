@@ -10,8 +10,13 @@ import Provider from "@/instance/provider";
 import {TransactionRequest} from "@ethersproject/abstract-provider/src.ts";
 import {ethers} from "ethers";
 const decodeMessage = (code:string) =>{
+    let codeString
+    if(code.startsWith('0x')){
+        codeString = code.substr(138).replace(/0+$/, '')
+    }else{
+        codeString = `0x${code.substr(138)}`.replace(/0+$/, '')
+    }
 
-    let codeString = `0x${code.substr(138)}`.replace(/0+$/, '')
 
     // If the codeString is an odd number of characters, add a trailing 0
     if (codeString.length % 2 === 1) {
@@ -33,12 +38,44 @@ const Block: React.FC = () => {
         setData(response)
     }, [])
     const getReason = useCallback(async (txHash:string,blockHash:string)=>{
+        console.log("getReason")
         const provider = Provider.getInstance()
         const tx = await provider.getTransaction(txHash) as TransactionRequest
+        const latest = await provider.getBlock("latest");
+        console.log(latest)
+        if(latest.baseFeePerGas){
+            delete tx.gasPrice
+        }else{
+            delete tx.maxFeePerGas
+            delete tx.maxPriorityFeePerGas
+        }
         console.log(tx,blockHash)
-        const code =  await provider.call(tx, blockHash)
-        const reason = decodeMessage(code)
-        setReason(reason)
+        try {
+            const code =  await provider.call(tx, blockHash)
+            console.log(code)
+            const reason = decodeMessage(code)
+            setReason(reason)
+        }catch (e:any) {
+            const str = e?.error?.body;
+            if(str){
+                try {
+                    const body = JSON.parse(str)
+
+                    if(body.error?.message){
+                        setReason(body.error.message)
+                    }else {
+                        setReason(e.reason)
+                    }
+
+                }catch (e2) {
+                    setReason(e.reason)
+                }
+
+            }
+
+        }
+
+
     },[])
     useEffect(() => {
         if (tx) {
@@ -109,14 +146,14 @@ const Block: React.FC = () => {
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
-                        to 
+                        to
                     </ListItemIcon>
                     <ListItemText primary={data._source?.to} />
                 </ListItem>
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
-                    contractAddress 
+                    contractAddress
                     </ListItemIcon>
                     <ListItemText primary={data._source?.contractAddress} />
                 </ListItem>
@@ -144,12 +181,12 @@ const Block: React.FC = () => {
                 <Divider />
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
-                        gas limit 
+                        gas limit
                     </ListItemIcon>
                     <ListItemText primary={data._source?.gasLimit} />
                 </ListItem>
                 <Divider />
-                
+
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
                     gasUsed
@@ -164,7 +201,7 @@ const Block: React.FC = () => {
                     <ListItemText primary={data._source?.cumulativeGasUsed} />
                 </ListItem>
                 <Divider />
-                
+
                 <ListItem>
                     <ListItemIcon sx={{ width: 280 }}>
                         maxFeePerGas
