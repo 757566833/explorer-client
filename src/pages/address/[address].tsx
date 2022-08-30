@@ -1,16 +1,37 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import Link from 'next/link';
-import { Box, Chip, TablePagination, TableFooter, Typography, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, List, ListItem, ListItemAvatar, Avatar, ListItemText, Button, useTheme, IconButton } from '@mui/material'
-import { LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material'
+import {
+    Box,
+    Chip,
+    TablePagination,
+    TableFooter,
+    Typography,
+    Paper,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    List,
+    ListItem,
+    ListItemAvatar,
+    Avatar,
+    ListItemText,
+    Button,
+    useTheme,
+    IconButton
+} from '@mui/material'
+import {LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft} from '@mui/icons-material'
 import {ethers} from 'ethers'
 import {ITx, IResponseList, IAddressListItem, EAddressType} from "@/services/interface";
-import { timeRender } from "@/lib/time";
-import { useRouter } from 'next/router';
-import { ETxType } from '@/constant/enum';
+import {timeRender} from "@/lib/time";
+import {useRouter} from 'next/router';
+import {ETxType} from '@/constant/enum';
 import Provider from '@/instance/provider';
-import { weiToEth } from '@/lib/utils/eth';
+import {weiToEth} from '@/lib/utils/eth';
 import Ellipsis from '@/lib/ellipsis';
-import { useClintNavigation } from '@/hooks/navigation';
+import {useClintNavigation} from '@/hooks/navigation';
 
 const Address: React.FC = () => {
     const theme = useTheme();
@@ -18,10 +39,10 @@ const Address: React.FC = () => {
     const [balance, setBalance] = useState("")
     const router = useRouter();
     const [clientNavigation] = useClintNavigation()
-    const [type,setType] = useState("unknow")
-    const { query } = router
-    const { address ,size='10',page='1' } = query
-    const func1 = useCallback(async (page: string,size:string, address: string) => {
+    const [type, setType] = useState("unknow")
+    const {query} = router
+    const {address, size = '10', page = '1'} = query
+    const func1 = useCallback(async (page: string, size: string, address: string) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/address/${address}?page=${page}&size=${size}`)
         const response: IResponseList<ITx> = await res.json()
         const hits = response.hits.hits
@@ -35,12 +56,12 @@ const Address: React.FC = () => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/addresses/detail?addresses=${address.toString()}`)
         const response: IResponseList<IAddressListItem> = await res.json()
         try {
-            const type =  EAddressType[response.hits.hits[0]._source.type]
+            const type = EAddressType[response.hits.hits[0]._source.type]
             setType(type)
-        }catch (e) {
-            
+        } catch (e) {
+
         }
-     
+
     }, [])
     const func2 = useCallback(async (address: string) => {
         const instance = await Provider.getInstance();
@@ -49,25 +70,25 @@ const Address: React.FC = () => {
     }, [])
     const handleBackButtonClick = useCallback(() => {
         clientNavigation.push(`/address/${address}?page=${ethers.BigNumber.from(page).sub(1).toString()}&size=${size}`).then()
-    },[address, clientNavigation, page, size]);
+    }, [address, clientNavigation, page, size]);
 
-    const handleNextButtonClick =useCallback( () => {
+    const handleNextButtonClick = useCallback(() => {
         clientNavigation.push(`/address/${address}?page=${ethers.BigNumber.from(page).add(1).toString()}&size=${size}`).then()
-    },[address, clientNavigation, page, size]);
+    }, [address, clientNavigation, page, size]);
 
-const refreshAddress =useCallback(async ()=>{
-    if(address){
-        await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/refresh/${address?.toString()}`,{
-            method:"POST"
-        })
-        getAddressesDetail(address?.toString()).then()
-    }
+    const refreshAddress = useCallback(async () => {
+        if (address) {
+            await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/refresh/${address?.toString()}`, {
+                method: "POST"
+            })
+            getAddressesDetail(address?.toString()).then()
+        }
 
-},[])
+    }, [address, getAddressesDetail])
 
     useEffect(() => {
         if (address) {
-            func1(page.toString(),size.toString(), address.toString()).then()
+            func1(page.toString(), size.toString(), address.toString()).then()
             func2(address.toString()).then()
             getAddressesDetail(address?.toString()).then()
         }
@@ -75,13 +96,14 @@ const refreshAddress =useCallback(async ()=>{
     }, [page, address, func1, func2, size, getAddressesDetail])
 
     return <Box width={1400} margin='0 auto'>
-         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} paddingTop={3} height={58}>
-             {type}{type!="unknow"||<Button variant={"text"} onClick={refreshAddress}>类型错误？点击刷新</Button>}
+        <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} paddingTop={3}
+                    height={58}>
+            {type}{type != "unknow" || <Button variant={"text"} onClick={refreshAddress}>类型错误？点击刷新</Button>}
         </Typography>
-        <Typography color={theme => theme.palette.text.primary} variant="body1" >
+        <Typography color={theme => theme.palette.text.primary} variant="body1">
             {address}
         </Typography>
-        <Typography color={theme => theme.palette.text.primary} variant="body1" >
+        <Typography color={theme => theme.palette.text.primary} variant="body1">
             {weiToEth(balance)} eth
         </Typography>
 
@@ -109,16 +131,16 @@ const refreshAddress =useCallback(async ()=>{
                                     <Link href={`/tx/${item._source?.hash}`}>{item._source?.hash || ''}</Link>
                                 </Ellipsis>
                             </TableCell>
-                            <TableCell >
+                            <TableCell>
                                 <Box width={140}>{timeRender(item._source?.timestamp)}</Box>
                             </TableCell>
                             <TableCell><Link href={`/block/${item._source?.number}`}>{item._source?.number || ''}</Link></TableCell>
                             <TableCell>
                                 {address == item._source.from ? <Chip label={<Ellipsis ellipsisWidth={160}>
                                     <Link href={`/address/${item._source?.from}`} passHref={true}>
-                                        <a style={{ color: '#ffffff' }}>{item._source?.from || ''}</a>
+                                        <a style={{color: '#ffffff'}}>{item._source?.from || ''}</a>
                                     </Link>
-                                </Ellipsis>} color="primary" /> : <Ellipsis ellipsisWidth={160}>
+                                </Ellipsis>} color="primary"/> : <Ellipsis ellipsisWidth={160}>
                                     <Link href={`/address/${item._source?.from}`}>{item._source?.from || ''}</Link>
                                 </Ellipsis>}
 
@@ -126,8 +148,9 @@ const refreshAddress =useCallback(async ()=>{
                             <TableCell>
 
                                 {address == item._source.to ? <Chip label={<Ellipsis ellipsisWidth={160}>
-                                    <Link href={`/address/${item._source?.to}`} passHref={true}><a style={{ color: '#ffffff' }}>{item._source?.to || ''}</a></Link>
-                                </Ellipsis>} color="primary" /> : <Ellipsis ellipsisWidth={160}>
+                                    <Link href={`/address/${item._source?.to}`} passHref={true}><a
+                                        style={{color: '#ffffff'}}>{item._source?.to || ''}</a></Link>
+                                </Ellipsis>} color="primary"/> : <Ellipsis ellipsisWidth={160}>
                                     <Link href={`/address/${item._source?.to}`}>{item._source?.to || ''}</Link>
                                 </Ellipsis>}
 
@@ -147,13 +170,13 @@ const refreshAddress =useCallback(async ()=>{
                                     disabled={page.toString() == '1'}
                                     aria-label="previous page"
                                 >
-                                    {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                                    {theme.direction === 'rtl' ? <KeyboardArrowRight/> : <KeyboardArrowLeft/>}
                                 </IconButton>
                                 <IconButton
                                     onClick={handleNextButtonClick}
                                     aria-label="next page"
                                 >
-                                    {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+                                    {theme.direction === 'rtl' ? <KeyboardArrowLeft/> : <KeyboardArrowRight/>}
                                 </IconButton>
 
                             </Box>
