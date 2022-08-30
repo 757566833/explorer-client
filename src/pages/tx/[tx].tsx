@@ -31,63 +31,17 @@ const Block: React.FC = () => {
     const { query } = router
     const { tx } = query
     const [data, setData] = useState<Partial<ITx>>({})
-    const [reason,setReason] = useState("")
     const func = useCallback(async (tx: string) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_RESTFUL}/tx/${tx}`)
         const response: ITx = await res.json()
         setData(response)
     }, [])
-    const getReason = useCallback(async (txHash:string,blockHash:string)=>{
-        console.log("getReason")
-        const provider = Provider.getInstance()
-        const tx = await provider.getTransaction(txHash) as TransactionRequest
-        const latest = await provider.getBlock("latest");
-        console.log(latest)
-        if(latest.baseFeePerGas){
-            delete tx.gasPrice
-        }else{
-            delete tx.maxFeePerGas
-            delete tx.maxPriorityFeePerGas
-        }
-        console.log(tx,blockHash)
-        try {
-            const code =  await provider.call(tx, blockHash)
-            console.log(code)
-            const reason = decodeMessage(code)
-            setReason(reason)
-        }catch (e:any) {
-            const str = e?.error?.body;
-            if(str){
-                try {
-                    const body = JSON.parse(str)
-
-                    if(body.error?.message){
-                        setReason(body.error.message)
-                    }else {
-                        setReason(e.reason)
-                    }
-
-                }catch (e2) {
-                    setReason(e.reason)
-                }
-
-            }
-
-        }
-
-
-    },[])
     useEffect(() => {
         if (tx) {
             func(tx.toString())
         }
 
     }, [func, tx])
-    useEffect(()=>{
-        if(data._source?.status==0&&tx){
-            getReason(tx.toString(),data._source.blockHash).then()
-        }
-    },[data._source?.status,tx,data._source?.blockHash])
 
     return <Box width={1400} margin='0 auto'>
         <Typography color={theme => theme.palette.text.primary} variant="h5" fontWeight={'bold'} padding={3}>
@@ -134,7 +88,7 @@ const Block: React.FC = () => {
                     <ListItemIcon sx={{ width: 280 }}>
                         reason
                     </ListItemIcon>
-                    <ListItemText primary={reason} />
+                    <ListItemText primary={data._source?.reason} />
                 </ListItem>
                 <Divider />
                 <ListItem>

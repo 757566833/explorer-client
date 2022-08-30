@@ -91,7 +91,7 @@ export interface ITx {
         type: number
         v: string
         value: string
-
+        reason:string
     },
     "_type": string,
     "sort": number[]
